@@ -47,17 +47,17 @@ from exp.base import *
 
 @app.route('/encode/<tag>', methods=['GET', 'POST'])
 def encode(tag):
-    if tag == 'b16encode':
+    if tag == 'Base16encode':
         fun, table = b16encode, b16table
-    elif tag == 'b32encode':
+    elif tag == 'Base32encode':
         fun, table = b32encode, b32table
-    elif tag == 'b58encode':
+    elif tag == 'Base58encode':
         fun, table = b58encode, b58table
-    elif tag == 'b64encode':
+    elif tag == 'Base64encode':
         fun, table = b64encode, b64table
-    elif tag == 'b85encode':
+    elif tag == 'Base85encode':
         fun, table = b85encode, b85table
-    elif tag == 'b91encode':
+    elif tag == 'Base91encode':
         fun, table = b91encode, b91table
     else:
         return redirect(url_for('index'))
@@ -77,17 +77,17 @@ def encode(tag):
 
 @app.route('/decode/<tag>', methods=['GET', 'POST'])
 def decode(tag):
-    if tag == 'b16decode':
+    if tag == 'Base16decode':
         fun, table = b16decode, b16table
-    elif tag == 'b32decode':
+    elif tag == 'Base32decode':
         fun, table = b32decode, b32table
-    elif tag == 'b58decode':
+    elif tag == 'Base58decode':
         fun, table = b58decode, b58table
-    elif tag == 'b64decode':
+    elif tag == 'Base64decode':
         fun, table = b64decode, b64table
-    elif tag == 'b85decode':
+    elif tag == 'Baseb85decode':
         fun, table = b85decode, b85table
-    elif tag == 'b91decode':
+    elif tag == 'Base91decode':
         fun, table = b91decode, b91table
     else:
         return redirect(url_for('index'))
@@ -103,3 +103,32 @@ def decode(tag):
                                tag=escape(tag))
     else:
         return render_template('decode.html', table=table, tag=escape(tag))
+
+
+from hashlib import *
+@app.route('/hash/<tag>', methods=['GET', 'POST'])
+def hash(tag):
+    if tag == 'MD5':
+        fun, table = b16decode, b16table
+    elif tag == 'SHA1':
+        fun, table = b32decode, b32table
+    elif tag == 'SHA224':
+        fun, table = b58decode, b58table
+    elif tag == 'SHA256':
+        fun, table = b64decode, b64table
+    elif tag == 'SHA384':
+        fun, table = b85decode, b85table
+    elif tag == 'SHA512':
+        fun, table = b91decode, b91table
+    else:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        src = request.form['src']
+        dest = md5(src.encode()).hexdigest()
+        return render_template('hash.html',
+                               src=escape(src),
+                               dest=escape(dest),
+                               tag=escape(tag))
+    else:
+        return render_template('hash.html',  tag=escape(tag))
