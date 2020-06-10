@@ -14,6 +14,18 @@ base编码、解码
 
 **安装方法:**
 
+<!-- python3.X 环境下 -->
+git clone https://github.com/yifeng-lee/ctftools.git
+
+pip install -r requirements.txt
+
+flask initdb(初始化数据库)
+
+flask admin(设置管理员账号密码)
+
+flask run
+
+
 **其他:**
 
 反汇编功能受用户登录限制,后续更新将会删除
