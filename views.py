@@ -16,7 +16,6 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        print(request.form['dest'])
         if not username or not password:
             flash('Invalid input.')
             return redirect(url_for('login'))
@@ -106,6 +105,8 @@ def decode(tag):
 
 
 from hashlib import *
+
+
 @app.route('/hash/<tag>', methods=['GET', 'POST'])
 def hash(tag):
     if tag == 'MD5':
@@ -131,4 +132,72 @@ def hash(tag):
                                dest=escape(dest),
                                tag=escape(tag))
     else:
-        return render_template('hash.html',  tag=escape(tag))
+        return render_template('hash.html', tag=escape(tag))
+
+
+from base64 import b16decode
+from capstone import *
+
+ARCH = {
+    'ARM': CS_ARCH_ARM,
+    'ARM64': CS_ARCH_ARM64,
+    'MIPS': CS_ARCH_MIPS,
+    'X86': CS_ARCH_X86,
+    'PPC': CS_ARCH_PPC,
+    'SPARC': CS_ARCH_SPARC
+}
+
+MODE = {
+    'ARM': CS_MODE_ARM,
+    'THUMB': CS_MODE_THUMB,
+    'MCLASS': CS_MODE_MCLASS,
+    'V8': CS_MODE_V8,
+    'MICRO': CS_MODE_MICRO,
+    'MIPS2': CS_MODE_MIPS2,
+    'MIPS3': CS_MODE_MIPS3,
+    'MIPS32R6': CS_MODE_MIPS32R6,
+    'MIPS32': CS_MODE_MIPS32,
+    'MIPS64': CS_MODE_MIPS64,
+    '16': CS_MODE_16,
+    '32': CS_MODE_32,
+    '64': CS_MODE_64,
+    'QPX': CS_MODE_QPX,
+    'V9': CS_MODE_V9
+}
+
+
+@app.route('/disassembly', methods=['GET', 'POST'])
+# @login_required
+def disassembly():
+
+    if request.method == 'POST':
+        base = request.form['base']
+        arch = request.form['arch']
+        mode = request.form['mode']
+        tmp = src = request.form['src']
+        src = src.replace(r'\x', '')
+        src = src.strip(r'b')
+        src = src.strip("'")
+        src = b16decode(src)
+
+        try:
+            if base.startswith('0x'):
+                base = int(base, 16)
+            else:
+                base = int(base)
+        except Exception as e:
+            base = 0
+
+        try:
+            dest = ''
+            md = Cs(ARCH[arch], MODE[mode])
+            for i in md.disasm(src, base):
+                dest += "0x%x:\t%s\t%s\n" % (i.address, i.mnemonic, i.op_str)
+        except Exception as e:
+            dest = e
+
+        return render_template(
+            'disassembly.html',
+            src=tmp,
+            dest=escape(dest) if dest != '' else 'Invalid arch or mode')
+    return render_template('disassembly.html')
