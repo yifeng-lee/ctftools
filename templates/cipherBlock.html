@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}{{ tag }}_{{ flag }}{% endblock %}
+
+
+{% block content %}
+<h5>{{ tag }}_{{ flag }}</h5>
+{% if tag == 'AES' %}
+<i>support AES-128 AES-192 AES-256</i>
+{% endif %}
+<form method="post">
+    <div class="form-group">
+        {% if flag == 'Encrypt' %}
+        <textarea class="form-control" rows="8" id="src" name="src" placeholder="input plain text">{{ src }}</textarea>
+        {% else %}
+        <textarea class="form-control" rows="8" id="src" name="src"
+            placeholder="input cipher text encode with base64">{{ src }}</textarea>
+        {% endif %}
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-2">
+            <label for="mode">MODE</label>
+            <select id="mode" class="form-control" name="mode">
+                <option value='ECB'>ECB</option>
+                <option value='CBC'>CBC</option>
+                <option value='CFB'>CFB</option>
+                <option value='OFB'>OFB</option>
+                <option value='CTR'>CTR</option>
+            </select>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label for="padding">PADDING</label>
+            <select id="padding" class="form-control" name="padding">
+                <option value='cms'>PKCS 7</option>
+                <option value='bit'>Bit</option>
+                <option value='zerolen'>Zerolen</option>
+                <option value='zero'>Zero</option>
+                <option value='null'>Null</option>
+                <option value='space'>Space</option>
+            </select>
+        </div>
+
+        <div class="form-group col-md-4">
+            <label for="key">KEY</label>
+            <input type="text" class="form-control" id="key" name="key" value = {{ key }}>
+        </div>
+
+        <div class="form-group col-md-4">
+            <label for="iv">IV</label>
+            <input type="text" class="form-control" id="iv" name="iv" value = {{ iv }}>
+        </div>
+
+    </div>
+    <button type="submit" class="btn btn-primary" value='encode'>{{ flag }}</button>
+    <br><br>
+    <div class="form-group">
+        {% if flag == 'Encrypt' %}
+        <textarea class="form-control" rows="8" id="dest" name="dest"
+            placeholder="output cipher text encode with base64">{{ dest }}</textarea>
+        {% else %}
+        <textarea class="form-control" rows="8" id="dest" name="dest"
+            placeholder="output plain text">{{ dest }}</textarea>
+        {% endif %}
+
+    </div>
+</form>
+{% endblock %}

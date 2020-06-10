@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}{{ tag }}_{{ flag }}{% endblock %}
+
+
+{% block content %}
+<h5>{{ tag }}_{{ flag }}</h5>
+<form method="post">
+    <div class="form-group">
+        {% if flag == 'Encrypt' %}
+        <textarea class="form-control" rows="8" id="src" name="src" placeholder="input plain text">{{ src }}</textarea>
+        {% else %}
+        <textarea class="form-control" rows="8" id="src" name="src"
+            placeholder="input cipher text encode with base64">{{ src }}</textarea>
+        {% endif %}
+    </div>
+    <div class="form-row">
+
+        <div class="form-group col-md-12">
+            <label for="key">KEY</label>
+            <input type="text" class="form-control" id="key" name="key" value = {{ key }}>
+        </div>
+
+    </div>
+    <button type="submit" class="btn btn-primary" value='encode'>{{ flag }}</button>
+    <br><br>
+    <div class="form-group">
+        {% if flag == 'Encrypt' %}
+        <textarea class="form-control" rows="8" id="dest" name="dest"
+            placeholder="output cipher text encode with base64">{{ dest }}</textarea>
+        {% else %}
+        <textarea class="form-control" rows="8" id="dest" name="dest"
+            placeholder="output plain text">{{ dest }}</textarea>
+        {% endif %}
+
+    </div>
+</form>
+{% endblock %}
