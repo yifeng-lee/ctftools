@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Disassembly{% endblock %}
+
+
+{% block content %}
+<h5>Disassembly</h5>
+<form method="post">
+  <div class="form-group">
+    <textarea class="form-control" rows="8" id="src" name="src">{{ src }}</textarea>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="base">BASE</label>
+      <input type="text" class="form-control" id="base" name="base" value="0x1000">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="arch">ARCH</label>
+      <select id="arch" class="form-control" name="arch">
+        <option value="ARM">ARM</option> <!-- ARM architecture (including Thumb, Thumb-2) -->
+        <option value="ARM64">ARM64</option> <!-- ARM-64, also called AArch64 -->
+        <option value="MIPS">MIPS</option> <!-- Mips architecture -->
+        <option value="X86">X86</option> <!-- X86 architecture (including x86 & x86-64) -->
+        <option value="PPC">PPC</option> <!-- PowerPC architecture (currently unsupported) -->
+        <option value="SPARC">SPARC</option> <!-- Sparc architecture -->
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label for="mode">MODE</label>
+      <select id="mode" class="form-control" name="mode">
+        <!-- arm / arm64 -->
+        <option value='ARM'>ARM mode</option>
+        <option value='THUMB'>THUMB mode</option>
+        <option value='MCLASS'>ARM's Cortex-M series</option>
+        <option value='V8'>ARMv8 A32 encodings for ARM</option>
+        <!-- mips -->
+        <option value='MICRO'>MicroMips mode</option>
+        <option value='MIPS2'>Mips II ISA</option>
+        <option value='MIPS3'>Mips III ISA</option>
+        <option value='MIPS32R6'>Mips32r6 ISA</option>
+        <option value='MIPS32'>Mips32 ISA</option>
+        <option value='MIPS64'>Mips64 ISA</option>
+        <!-- x86 / x64 -->
+        <option value='16'>16-bits</option>
+        <option value='32'>32-bits</option>
+        <option value='64'>64-bits</option>
+        <!-- ppc  -->
+        <option value='QPX'>Quad Processing eXtensions mode</option>
+        <!-- sparc -->
+        <option value='V9'>SparcV9 mode</option>
+      </select>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary">Disassembly</button>
+  <br><br>
+  <div class="form-group">
+    <textarea class="form-control" rows="26" id="dest" name="dest">{{ dest }}</textarea>
+  </div>
+</form>
+{% endblock %}
