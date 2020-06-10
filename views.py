@@ -167,7 +167,7 @@ MODE = {
 
 
 @app.route('/disassembly', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def disassembly():
 
     if request.method == 'POST':
@@ -201,3 +201,119 @@ def disassembly():
             src=tmp,
             dest=escape(dest) if dest != '' else 'Invalid arch or mode')
     return render_template('disassembly.html')
+
+
+from Crypto.Cipher import AES, ARC4, Blowfish, DES, DES3, ARC2, XOR
+import Padding
+
+block = {
+    'AES': AES,
+    'DES': DES,
+    'DES3': DES3,
+    'RC4': ARC4,
+    'Blowfish': Blowfish,
+    'RC2': ARC2,
+    'XOR': XOR
+}
+cipherMode = {
+    'ECB': AES.MODE_ECB,
+    'CBC': AES.MODE_CBC,
+    'CFB': AES.MODE_CFB,
+    'OFB': AES.MODE_OFB,
+    'CTR': AES.MODE_CTR
+}
+
+
+@app.route('/decrypt/block/<tag>', methods=['GET', 'POST'])
+@app.route('/encrypt/block/<tag>', methods=['GET', 'POST'])
+def cipherBlock(tag):
+
+    if tag not in block.keys():
+        return redirect(url_for('index'))
+
+    from base64 import b64encode, b64decode
+    tmp, src, dest, key, iv = '', '', '', b'', b''
+
+    if request.method == 'POST':
+        tmp = src = request.form['src']
+        key = request.form['key'].encode()
+        iv = request.form['iv'].encode()
+        mode = request.form['mode']
+        padding = request.form['padding']
+        c = block[str(tag)]
+
+        try:
+            if mode == 'ECB' or mode == 'CBC' or mode == 'CFB':
+                src = Padding.appendPadding(src, c.block_size, padding)
+            cipher = c.new(key, cipherMode[mode], iv)
+            if 'encrypt' in request.url:
+                dest = cipher.encrypt(src.encode())
+                dest = b64encode(dest).decode()
+            else:
+                src = b64decode(src.encode())
+                dest = cipher.decrypt(src).decode()
+                dest = Padding.removePadding(dest)
+        except Exception as e:
+            dest = e
+
+    if 'encrypt' in request.url:
+        return render_template('cipherBlock.html',
+                               tag=escape(tag.upper()),
+                               flag='Encrypt',
+                               src=escape(tmp),
+                               dest=escape(dest),
+                               key=escape(key.decode()),
+                               iv=escape(iv.decode()))
+
+    else:
+        return render_template('cipherBlock.html',
+                               tag=escape(tag.upper()),
+                               flag='Decrypt',
+                               src=escape(tmp),
+                               dest=escape(dest),
+                               key=escape(key.decode()),
+                               iv=escape(iv.decode()))
+
+
+stream = {'RC4': ARC4, 'XOR': XOR}
+
+
+@app.route('/decrypt/stream/<tag>', methods=['GET', 'POST'])
+@app.route('/encrypt/stream/<tag>', methods=['GET', 'POST'])
+def cipherStream(tag):
+
+    if tag not in block.keys():
+        return redirect(url_for('index'))
+
+    from base64 import b64encode, b64decode
+    tmp, src, dest, key = '', '', '', b''
+
+    if request.method == 'POST':
+        tmp = src = request.form['src']
+        key = request.form['key'].encode()
+        c = stream[str(tag)]
+        try:
+            cipher = c.new(key)
+            if 'encrypt' in request.url:
+                dest = cipher.encrypt(src.encode())
+                dest = b64encode(dest).decode()
+            else:
+                src = b64decode(src.encode())
+                dest = cipher.decrypt(src).decode()
+        except Exception as e:
+            dest = e
+
+    if 'encrypt' in request.url:
+        return render_template('cipherStream.html',
+                               tag=escape(tag.upper()),
+                               flag='Encrypt',
+                               src=escape(tmp),
+                               dest=escape(dest),
+                               key=escape(key.decode()))
+    else:
+        return render_template('cipherStream.html',
+                               tag=escape(tag.upper()),
+                               flag='Decrypt',
+                               src=escape(tmp),
+                               dest=escape(dest),
+                               key=escape(key.decode()))
