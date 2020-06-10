@@ -178,7 +178,11 @@ def disassembly():
         src = src.replace(r'\x', '')
         src = src.strip(r'b')
         src = src.strip("'")
-        src = b16decode(src)
+
+        try:
+            src = b16decode(src)
+        except Exception as e:
+            return render_template('disassembly.html')
 
         try:
             if base.startswith('0x'):
